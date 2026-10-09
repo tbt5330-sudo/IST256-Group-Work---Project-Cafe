@@ -1,0 +1,33 @@
+h4 {
+    font-weight: bold;
+}
+
+.form-label {
+    font-weight: bold;
+}
+
+.btn-primary {
+    padding: 10px;
+    font-size: 1.1rem;
+    background-color: #854842 !important;
+    color: whitesmoke !important;
+    border-color: #854842 !important;
+}
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn-success {
+    background-color: #854842 !important;
+    color: whitesmoke !important;
+    border-color: #854842 !important;
+}
+.btn-success:focus,
+.btn-success:active,
+.btn-success:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
