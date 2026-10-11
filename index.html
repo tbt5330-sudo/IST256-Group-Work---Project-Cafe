@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cozy Corner Cafe</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Our custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light cafe-navbar">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                ☕ Cozy Corner Cafe
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarMenu"
+                aria-controls="navbarMenu"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#menu">Our Menu</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About Us</a>
+                    </li>
+
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-coffee" href="signup.html">
+                            Join Our Cafe
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Hero Section -->
+    <header class="hero-section" id="home">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 hero-content">
+                    <p class="eyebrow">YOUR NEIGHBORHOOD COFFEE SPOT</p>
+
+                    <h1>
+                        Your Daily Dose
+                        <br>
+                        of <span>Comfort.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Freshly brewed coffee, delicious pastries, and
+                        a cozy place to slow down and enjoy the moment.
+                    </p>
+
+                    <a href="#menu" class="btn btn-coffee btn-lg">
+                        Explore Our Menu
+                    </a>
+
+                    <a href="signup.html" class="btn btn-outline-coffee btn-lg">
+                        Become a Member
+                    </a>
+                </div>
+
+                <div class="col-lg-5 mt-5 mt-lg-0">
+                    <img
+                        src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1000&q=85"
+                        class="img-fluid hero-image"
+                        alt="Cozy cafe with coffee and a welcoming atmosphere"
+                    >
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Featured Menu -->
+    <section class="menu-section py-5" id="menu">
+        <div class="container">
+            <div class="text-center section-heading">
+                <p class="eyebrow">MADE WITH LOVE</p>
+                <h2>Our Cafe Favorites</h2>
+                <p>Little treats to make your day a little sweeter.</p>
+            </div>
+
+            <div class="row g-4 mt-3">
+
+                <!-- Menu Item 1 -->
+                <div class="col-md-4">
+                    <div class="card menu-card h-100">
+                        <img
+                            src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=85"
+                            class="card-img-top"
+                            alt="Freshly prepared latte"
+                        >
+
+                        <div class="card-body text-center">
+                            <h3 class="card-title">Classic Latte</h3>
+                            <p class="card-text">
+                                Smooth espresso blended with creamy steamed milk.
+                            </p>
+                            <p class="menu-price">$4.50</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 2 -->
+                <div class="col-md-4">
+                    <div class="card menu-card h-100">
+                        <img
+                            src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=85"
+                            class="card-img-top"
+                            alt="Freshly baked croissants"
+                        >
+
+                        <div class="card-body text-center">
+                            <h3 class="card-title">Butter Croissant</h3>
+                            <p class="card-text">
+                                A golden, flaky pastry baked for a perfect morning.
+                            </p>
+                            <p class="menu-price">$3.25</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 3 -->
+                <div class="col-md-4">
+                    <div class="card menu-card h-100">
+                        <img
+                            src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=85"
+                            class="card-img-top"
+                            alt="Chocolate cake dessert"
+                        >
+
+                        <div class="card-body text-center">
+                            <h3 class="card-title">Chocolate Cake</h3>
+                            <p class="card-text">
+                                A rich chocolate treat for your afternoon break.
+                            </p>
+                            <p class="menu-price">$5.00</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- About Section -->
+    <section class="about-section py-5" id="about">
+        <div class="container text-center">
+            <p class="eyebrow">MORE THAN JUST COFFEE</p>
+
+            <h2>A Little Place to Feel at Home</h2>
+
+            <p class="about-description mx-auto">
+                At Cozy Corner Cafe, we believe the best moments happen
+                over a good cup of coffee. Stop by to study, catch up with
+                friends, or simply enjoy a peaceful break.
+            </p>
+
+            <a href="signup.html" class="btn btn-coffee btn-lg">
+                Join Our Rewards Club
+            </a>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="cafe-footer py-4">
+        <div class="container text-center">
+            <h3>☕ Cozy Corner Cafe</h3>
+
+            <p>Good coffee. Good company. Good moments.</p>
+
+            <p class="mb-1">Monday – Saturday: 7 AM – 6 PM</p>
+
+            <a href="signup.html">Become a Member</a>
+
+            <p class="copyright mt-3 mb-0">
+                &copy; 2026 Cozy Corner Cafe. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap JavaScript for the mobile menu -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
