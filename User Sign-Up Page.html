@@ -10,6 +10,7 @@
 </head>
 <body class="bg-light">
     <div class="container mt-5">
+        <!-- Temporary Button -->
         <button class="btn btn-primary btn-lg" style="background-color: #854842; color: whitesmoke;" data-bs-toggle="modal" data-bs-target="#signupModal">
             Sign-Up
         </button>
@@ -26,31 +27,37 @@
 
                 <div class="modal-body">
                     <form>
+                        <!-- Full Name Input -->
                         <div class="mb-3">
                             <label for="name" class="form-label">Enter your Full Name:</label>
                             <input type="text" class="form-control" id="name" required>
                         </div>
 
+                        <!-- User Age Input -->
                         <div class="mb-3">
                             <label for="age" class="form-label">Enter your Age:</label>
                             <input type="number" class="form-control" id="age" min="1" required>
                         </div>
 
+                        <!-- Email Address Input -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Enter your Email Address:</label>
                             <input type="email" class="form-control" id="email" required>
                         </div>
 
+                        <!-- Street Address Input -->
                         <div class="mb-3">
                             <label for="address" class="form-label">Enter your Street Address:</label>
                             <input type="text" class="form-control" id="address" required>
                         </div>
 
+                        <!-- Phone Number Input -->
                         <div class="mb-3">
                             <label for="phone" class="form-label">Enter your Phone Number (optional):</label>
                             <input type="tel" class="form-control" id="phone">
                         </div>
 
+                        <!-- Submition Button -->
                         <div class="d-grid">
                             <button type="submit" class="btn btn-success btn-lg" style="background-color: #854842; color: whitesmoke;">Create Account</button>
                         </div>
