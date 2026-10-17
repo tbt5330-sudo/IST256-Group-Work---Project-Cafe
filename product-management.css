@@ -1,0 +1,148 @@
+body {
+    background-color: #f8f4ef;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #333;
+}
+
+/* Navbar */
+
+.cafe-navbar {
+    background-color: #854842;
+}
+
+.cafe-navbar .navbar-brand {
+    color: white;
+    font-size: 1.4rem;
+}
+
+.cafe-navbar .navbar-brand:hover {
+    color: #f5e6dc;
+}
+
+/* Header */
+
+.page-header {
+    background: linear-gradient(
+        rgba(133, 72, 66, 0.90),
+        rgba(133, 72, 66, 0.90)
+    );
+    color: white;
+    padding: 60px 20px;
+    padding-top: 20px;
+}
+
+.page-header h1 {
+    font-weight: bold;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+}
+
+.cafe-navbar {
+    background-color: #854842;
+}
+
+.cafe-navbar .navbar-brand {
+    color: white;
+    font-weight: bold;
+}
+
+.cafe-navbar .nav-link {
+    color: white;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+
+.cafe-navbar .nav-link:hover {
+    color: #f4d4b2;
+}
+
+/* Active Products Page Link */
+
+.products-link {
+    font-weight: bold;
+    border-bottom: 2px solid #f4d4b2;
+}
+
+/* Button */
+
+.btn-products {
+    background-color: #f4d4b2;
+    color: #854842;
+    border: none;
+}
+
+.btn-products:hover {
+    background-color: #ffffff;
+    color: #854842;
+}
+
+/* Cards */
+
+.management-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.management-card .card-header {
+    background-color: #854842;
+    color: white;
+}
+
+/* Form Controls */
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #854842;
+    box-shadow: 0 0 5px rgba(133,72,66,0.5);
+}
+
+/* Buttons */
+
+.btn-create {
+    background-color: #854842;
+    color: white;
+    border: none;
+}
+
+.btn-create:hover {
+    background-color: #6f3b36;
+    color: white;
+}
+
+.btn-update {
+    background-color: #c7925a;
+    color: white;
+    border: none;
+}
+
+.btn-update:hover {
+    background-color: #b38048;
+    color: white;
+}
+
+/* Table */
+
+.table thead {
+    background-color: #854842;
+    color: white;
+}
+
+.table tbody tr:hover {
+    background-color: #f3e5dd;
+}
+
+/* Footer */
+
+.footer {
+    background-color: #854842;
+    color: white;
+}
