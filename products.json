@@ -1,5 +1,23 @@
 [
-  { "id": "LAT001", "name": "Classic Latte", "category": "Coffee", "unit": "Cup", "price": 4.5 },
-  { "id": "CRO002", "name": "Butter Croissant", "category": "Pastry", "unit": "Piece", "price": 3.25 },
-  { "id": "CAK003", "name": "Chocolate Cake", "category": "Dessert", "unit": "Slice", "price": 5 }
+  {
+    "id": "LAT001",
+    "name": "Classic Latte",
+    "category": "Coffee",
+    "unit": "Cup",
+    "price": 4.50
+  },
+  {
+    "id": "CRO002",
+    "name": "Butter Croissant",
+    "category": "Pastry",
+    "unit": "Piece",
+    "price": 3.25
+  },
+  {
+    "id": "CAK003",
+    "name": "Chocolate Cake",
+    "category": "Dessert",
+    "unit": "Slice",
+    "price": 5.00
+  }
 ]
