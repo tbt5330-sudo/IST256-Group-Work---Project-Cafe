@@ -4,8 +4,6 @@ body {
     color: #333;
 }
 
-/* Navbar */
-
 .cafe-navbar {
     background-color: #854842;
 }
@@ -18,8 +16,6 @@ body {
 .cafe-navbar .navbar-brand:hover {
     color: #f5e6dc;
 }
-
-/* Header */
 
 .page-header {
     background: linear-gradient(
@@ -58,14 +54,10 @@ body {
     color: #f4d4b2;
 }
 
-/* Active Products Page Link */
-
 .products-link {
     font-weight: bold;
     border-bottom: 2px solid #f4d4b2;
 }
-
-/* Button */
 
 .btn-products {
     background-color: #f4d4b2;
@@ -78,8 +70,6 @@ body {
     color: #854842;
 }
 
-/* Cards */
-
 .management-card {
     border: none;
     border-radius: 15px;
@@ -90,8 +80,6 @@ body {
     background-color: #854842;
     color: white;
 }
-
-/* Form Controls */
 
 .form-control,
 .form-select {
@@ -104,8 +92,6 @@ body {
     border-color: #854842;
     box-shadow: 0 0 5px rgba(133,72,66,0.5);
 }
-
-/* Buttons */
 
 .btn-create {
     background-color: #854842;
@@ -129,8 +115,6 @@ body {
     color: white;
 }
 
-/* Table */
-
 .table thead {
     background-color: #854842;
     color: white;
@@ -139,8 +123,6 @@ body {
 .table tbody tr:hover {
     background-color: #f3e5dd;
 }
-
-/* Footer */
 
 .footer {
     background-color: #854842;
