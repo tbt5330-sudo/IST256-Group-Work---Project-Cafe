@@ -4,22 +4,40 @@ body {
     color: #333;
 }
 
-/* Navbar */
-
 .cafe-navbar {
     background-color: #854842;
+    margin-bottom: 15px;
 }
 
 .cafe-navbar .navbar-brand {
     color: white;
     font-size: 1.4rem;
+    font-weight: bold;
 }
 
 .cafe-navbar .navbar-brand:hover {
     color: #f5e6dc;
 }
 
-/* Header */
+.cafe-navbar .nav-link {
+    color: white;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+
+.cafe-navbar .nav-link:hover {
+    color: #f4d4b2;
+}
+
+.cart-link,
+.products-link {
+    font-weight: bold;
+    border-bottom: 2px solid #f4d4b2;
+}
+
+.cart-link {
+    color: #f4d4b2 !important;
+}
 
 .page-header {
     background: linear-gradient(
@@ -39,59 +57,18 @@ body {
     font-size: 1.1rem;
 }
 
-.cafe-navbar {
-    background-color: #854842;
-}
-
-.cafe-navbar .navbar-brand {
-    color: white;
-    font-weight: bold;
-}
-
-.cafe-navbar .nav-link {
-    color: white;
-    margin-left: 10px;
-    transition: 0.3s;
-}
-
-.cafe-navbar .nav-link:hover {
-    color: #f4d4b2;
-}
-
-/* Active Products Page Link */
-
-.products-link {
-    font-weight: bold;
-    border-bottom: 2px solid #f4d4b2;
-}
-
-/* Button */
-
-.btn-products {
-    background-color: #f4d4b2;
-    color: #854842;
-    border: none;
-}
-
-.btn-products:hover {
-    background-color: #ffffff;
-    color: #854842;
-}
-
-/* Cards */
-
+.shopping-card,
 .management-card {
     border: none;
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+.shopping-card .card-header,
 .management-card .card-header {
     background-color: #854842;
     color: white;
 }
-
-/* Form Controls */
 
 .form-control,
 .form-select {
@@ -105,7 +82,48 @@ body {
     box-shadow: 0 0 5px rgba(133,72,66,0.5);
 }
 
-/* Buttons */
+.btn-products {
+    background-color: #f4d4b2;
+    color: #854842;
+    border: none;
+}
+
+.btn-products:hover {
+    background-color: #ffffff;
+    color: #854842;
+}
+
+.btn-add {
+    background-color: #854842;
+    color: white;
+    border: none;
+}
+
+.btn-add:hover {
+    background-color: #6f3b36;
+    color: white;
+}
+
+.btn-remove {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-remove:hover {
+    background-color: #bb2d3b;
+    color: white;
+}
+
+.btn-checkout {
+    background-color: #854842;
+    color: white;
+    border: none;
+}
+
+.btn-checkout:hover {
+    background-color: #6f3b36;
+}
 
 .btn-create {
     background-color: #854842;
@@ -129,9 +147,8 @@ body {
     color: white;
 }
 
-/* Table */
-
-.table thead {
+.table thead,
+.table thead th {
     background-color: #854842;
     color: white;
 }
@@ -140,7 +157,10 @@ body {
     background-color: #f3e5dd;
 }
 
-/* Footer */
+#grandTotal {
+    font-weight: bold;
+    color: #854842;
+}
 
 .footer {
     background-color: #854842;
