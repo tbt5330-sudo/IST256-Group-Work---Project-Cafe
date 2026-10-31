@@ -4,6 +4,8 @@ body {
     color: #333;
 }
 
+/* Navbar */
+
 .cafe-navbar {
     background-color: #854842;
     margin-bottom: 15px;
@@ -19,25 +21,7 @@ body {
     color: #f5e6dc;
 }
 
-.cafe-navbar .nav-link {
-    color: white;
-    margin-left: 10px;
-    transition: 0.3s;
-}
-
-.cafe-navbar .nav-link:hover {
-    color: #f4d4b2;
-}
-
-.cart-link,
-.products-link {
-    font-weight: bold;
-    border-bottom: 2px solid #f4d4b2;
-}
-
-.cart-link {
-    color: #f4d4b2 !important;
-}
+/* Header */
 
 .page-header {
     background: linear-gradient(
@@ -57,7 +41,47 @@ body {
     font-size: 1.1rem;
 }
 
-.shopping-card,
+.cafe-navbar {
+    background-color: #854842;
+}
+
+.cafe-navbar .navbar-brand {
+    color: white;
+    font-weight: bold;
+}
+
+.cafe-navbar .nav-link {
+    color: white;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+
+.cafe-navbar .nav-link:hover {
+    color: #f4d4b2;
+}
+
+/* Active Products Page Link */
+
+.products-link {
+    font-weight: bold;
+    border-bottom: 2px solid #f4d4b2;
+}
+
+/* Button */
+
+.btn-products {
+    background-color: #f4d4b2;
+    color: #854842;
+    border: none;
+}
+
+.btn-products:hover {
+    background-color: #ffffff;
+    color: #854842;
+}
+
+/* Cards */
+
 .management-card {
     border: none;
     border-radius: 15px;
@@ -82,48 +106,7 @@ body {
     box-shadow: 0 0 5px rgba(133,72,66,0.5);
 }
 
-.btn-products {
-    background-color: #f4d4b2;
-    color: #854842;
-    border: none;
-}
-
-.btn-products:hover {
-    background-color: #ffffff;
-    color: #854842;
-}
-
-.btn-add {
-    background-color: #854842;
-    color: white;
-    border: none;
-}
-
-.btn-add:hover {
-    background-color: #6f3b36;
-    color: white;
-}
-
-.btn-remove {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-}
-
-.btn-remove:hover {
-    background-color: #bb2d3b;
-    color: white;
-}
-
-.btn-checkout {
-    background-color: #854842;
-    color: white;
-    border: none;
-}
-
-.btn-checkout:hover {
-    background-color: #6f3b36;
-}
+/* Buttons */
 
 .btn-create {
     background-color: #854842;
@@ -147,8 +130,9 @@ body {
     color: white;
 }
 
-.table thead,
-.table thead th {
+/* Table */
+
+.table thead {
     background-color: #854842;
     color: white;
 }
@@ -157,10 +141,7 @@ body {
     background-color: #f3e5dd;
 }
 
-#grandTotal {
-    font-weight: bold;
-    color: #854842;
-}
+/* Footer */
 
 .footer {
     background-color: #854842;

@@ -164,3 +164,24 @@ function showMessage(text, type) {
   $("#message").html("<div class='alert alert-" + type + " py-2'>" + escapeHtml(text) + "</div>");
   setTimeout(function () { $("#message").empty(); }, 3000);
 }
+// AJAX: send product JSON to a RESTful API (API will be built later)
+var API_URL = "https://example.com/api/products"; // placeholder
+
+function sendToAPI(item, method) {
+  var url = (method === "POST") ? API_URL : API_URL + "/" + encodeURIComponent(item.id);
+
+  $.ajax({
+    url: url,
+    type: method,
+    contentType: "application/json",
+    data: JSON.stringify(item),
+    dataType: "json",
+    timeout: 5000
+  })
+  .done(function () {
+    showMessage("Product sent to the API.", "success");
+  })
+  .fail(function () {
+    showMessage("Saved locally. API is not available yet.", "warning");
+  });
+}
