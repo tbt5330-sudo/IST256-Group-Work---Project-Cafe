@@ -1,0 +1,82 @@
+/* ===== Cozy Corner Cafe - Global Styles ===== */
+:root {
+  --coffee: #854842;
+  --coffee-dark: #6a3a35;
+  --cream: #faf5ef;
+  --text: #3b2a27;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--text);
+  background-color: #fff;
+}
+
+/* Navbar */
+.cafe-navbar {
+  background-color: var(--cream);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.cafe-navbar .navbar-brand { color: var(--coffee); }
+.cafe-navbar .nav-link { color: var(--text); font-weight: 500; }
+.cafe-navbar .nav-link:hover,
+.cafe-navbar .nav-link.active { color: var(--coffee); }
+
+/* Buttons */
+.btn-coffee {
+  background-color: var(--coffee);
+  color: whitesmoke;
+  border: none;
+}
+.btn-coffee:hover { background-color: var(--coffee-dark); color: #fff; }
+.btn-outline-coffee {
+  border: 2px solid var(--coffee);
+  color: var(--coffee);
+  background: transparent;
+}
+.btn-outline-coffee:hover { background-color: var(--coffee); color: #fff; }
+
+/* Hero */
+.hero-section {
+  background-color: var(--cream);
+  padding: 80px 0;
+}
+.hero-content h1 { font-size: 3rem; font-weight: 700; }
+.hero-content h1 span { color: var(--coffee); }
+.hero-description { font-size: 1.15rem; margin: 20px 0 28px; }
+.hero-image { border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); }
+.eyebrow {
+  color: var(--coffee);
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Storefront / menu cards */
+.menu-section { background-color: #fff; }
+.section-heading h2 { font-weight: 700; }
+.menu-card {
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+.menu-card:hover { transform: translateY(-5px); }
+.menu-card .card-img-top { height: 200px; object-fit: cover; }
+.menu-card .card-title { font-size: 1.25rem; font-weight: 600; }
+.menu-price { color: var(--coffee); font-size: 1.2rem; font-weight: 700; }
+
+/* About */
+.about-section { background-color: var(--cream); }
+.about-description { max-width: 650px; margin-bottom: 24px; }
+
+/* Footer */
+.cafe-footer { background-color: var(--coffee); color: #f5e9e2; }
+.cafe-footer a { color: #fff; }
+.cafe-footer .copyright { font-size: 0.85rem; opacity: 0.8; }
+
+@media (max-width: 576px) {
+  .hero-content h1 { font-size: 2.2rem; }
+  .hero-section { padding: 50px 0; }
+}
