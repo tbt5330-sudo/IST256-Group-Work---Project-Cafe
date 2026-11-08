@@ -6,21 +6,35 @@
   --text: #3b2a27;
 }
 
+/*.page-header {
+    background-color: var(--cream);
+    padding: 60px 0;
+}
+
+.page-header h1 {
+    color: var(--coffee);
+    font-weight: 700;
+}
+
+.page-header p {
+    color: var(--text);
+}
+
 body {
   font-family: "Segoe UI", Arial, sans-serif;
   color: var(--text);
   background-color: #fff;
-}
+}*/
 
 /* Navbar */
 .cafe-navbar {
   background-color: var(--cream);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
-.cafe-navbar .navbar-brand { color: var(--coffee); }
+.cafe-navbar .navbar-brand { color: whitesmoke; }
 .cafe-navbar .nav-link { color: var(--text); font-weight: 500; }
 .cafe-navbar .nav-link:hover,
-.cafe-navbar .nav-link.active { color: var(--coffee); }
+.cafe-navbar .nav-link.active { color: whitesmoke; }
 
 /* Buttons */
 .btn-coffee {
@@ -66,6 +80,23 @@ body {
 .menu-card .card-img-top { height: 200px; object-fit: cover; }
 .menu-card .card-title { font-size: 1.25rem; font-weight: 600; }
 .menu-price { color: var(--coffee); font-size: 1.2rem; font-weight: 700; }
+
+/*.shopping-card {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.shopping-card .card-header {
+    background-color: var(--coffee);
+    color: var(--cream)
+    font-weight: 600;
+}
+
+.shopping-card .card-body {
+    background-color: var(--cream);
+}*/
 
 /* About */
 .about-section { background-color: var(--cream); }
