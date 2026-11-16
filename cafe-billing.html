@@ -1,10 +1,9 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="billingApp">
 
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
@@ -19,11 +18,17 @@
     <link rel="stylesheet" href="product-management.css">
     <link rel="stylesheet" href="signup.css">
 
+    <style>
+        [ng-cloak] {
+            display: none !important;
+        }
+    </style>
+
 </head>
 
-<body>
+<body ng-controller="BillingController" ng-cloak>
 
-    <!-- Cafe Navigation Bar -->
+    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light cafe-navbar">
 
         <div class="container">
@@ -83,8 +88,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link"
-                           href="cafe-returns.html">
+                        <a class="nav-link" href="cafe-returns.html">
                             Returns
                         </a>
                     </li>
@@ -102,27 +106,24 @@
                     </li>
 
                     <li class="nav-item ms-lg-3">
-
-                        <a class="btn btn-primary btn-lg"
-                           href="User%20Sign-Up%20Page.html"
-                           style="background-color: whitesmoke; color: #854842;">
+                        <a
+                            class="btn btn-primary btn-lg"
+                            href="User%20Sign-Up%20Page.html"
+                            style="background-color: whitesmoke; color: #854842;">
 
                             Sign-Up
 
                         </a>
-
                     </li>
 
                 </ul>
 
             </div>
-
         </div>
-
     </nav>
 
 
-    <!-- Billing Page Header -->
+    <!-- Billing Header -->
     <header class="page-header text-center">
 
         <div class="container">
@@ -130,8 +131,7 @@
             <h1>Billing Details</h1>
 
             <p>
-                Review your order and submit your billing
-                information.
+                Review your order and enter your billing information.
             </p>
 
         </div>
@@ -144,26 +144,58 @@
 
         <div class="row g-4">
 
-            <!-- Customer Billing Form -->
+            <!-- Billing Form -->
             <div class="col-lg-8">
 
                 <div class="card billing-card mb-4">
 
                     <div class="card-header">
-
                         <h3>Customer Information</h3>
-
                     </div>
 
                     <div class="card-body">
 
-                        <!-- Billing Validation Messages -->
-                        <div id="billingMessage"
-                             aria-live="polite">
+                        <!-- Validation Errors -->
+                        <div
+                            class="alert alert-danger"
+                            role="alert"
+                            ng-if="status.errors.length > 0">
+
+                            <strong>
+                                Please correct the following:
+                            </strong>
+
+                            <ul class="mb-0">
+                                <li ng-repeat="error in status.errors track by $index">
+                                    {{error}}
+                                </li>
+                            </ul>
+
                         </div>
 
-                        <!-- Billing Form -->
-                        <form id="billingForm">
+
+                        <!-- Success Message -->
+                        <div
+                            class="alert alert-success"
+                            role="status"
+                            ng-if="status.success">
+
+                            <strong>Success!</strong>
+
+                            <p class="mb-0">
+                                {{status.message}}
+                            </p>
+
+                        </div>
+
+
+                        <!-- AngularJS Billing Form -->
+                        <form
+                            id="billingForm"
+                            name="billingForm"
+                            ng-submit="submitBilling()"
+                            novalidate>
+
 
                             <!-- Full Name -->
                             <div class="mb-3">
@@ -180,10 +212,20 @@
                                     id="fullName"
                                     name="fullName"
                                     class="form-control"
+                                    ng-model="billing.fullName"
                                     placeholder="Enter your full name"
                                     autocomplete="name"
                                     minlength="2"
                                     required>
+
+                                <small
+                                    class="text-danger"
+                                    ng-show="billingForm.fullName.$touched &&
+                                             billingForm.fullName.$invalid">
+
+                                    Please enter your full name.
+
+                                </small>
 
                             </div>
 
@@ -203,14 +245,24 @@
                                     name="address"
                                     class="form-control"
                                     rows="3"
-                                    placeholder="Enter your street address, city, state, and ZIP code"
+                                    ng-model="billing.address"
+                                    placeholder="Street address, city, state and ZIP code"
                                     autocomplete="street-address"
                                     required></textarea>
+
+                                <small
+                                    class="text-danger"
+                                    ng-show="billingForm.address.$touched &&
+                                             billingForm.address.$invalid">
+
+                                    Billing address is required.
+
+                                </small>
 
                             </div>
 
 
-                            <!-- Payment Information -->
+                            <!-- Payment Details -->
                             <h4 class="section-title mt-4">
 
                                 Payment Information
@@ -219,11 +271,11 @@
 
                             <p class="text-muted small">
                                 Classroom demonstration only.
-                                Do not enter real credit card details.
+                                Do not enter real credit card information.
                             </p>
 
 
-                            <!-- Credit Card Number -->
+                            <!-- Card Number -->
                             <div class="mb-3">
 
                                 <label for="cardNumber"
@@ -238,16 +290,25 @@
                                     id="cardNumber"
                                     name="cardNumber"
                                     class="form-control"
+                                    ng-model="billing.cardNumber"
                                     placeholder="1234 5678 9012 3456"
                                     inputmode="numeric"
                                     autocomplete="off"
                                     maxlength="23"
                                     required>
 
+                                <small
+                                    class="text-danger"
+                                    ng-show="billingForm.cardNumber.$touched &&
+                                             billingForm.cardNumber.$invalid">
+
+                                    Credit card number is required.
+
+                                </small>
+
                             </div>
 
 
-                            <!-- Expiration and Security Code -->
                             <div class="row">
 
                                 <!-- Expiration Date -->
@@ -265,13 +326,23 @@
                                         id="expiration"
                                         name="expiration"
                                         class="form-control"
+                                        ng-model="billing.expiration"
                                         autocomplete="off"
                                         required>
+
+                                    <small
+                                        class="text-danger"
+                                        ng-show="billingForm.expiration.$touched &&
+                                                 billingForm.expiration.$invalid">
+
+                                        Valid expiration date is required.
+
+                                    </small>
 
                                 </div>
 
 
-                                <!-- CVV -->
+                                <!-- Security Code -->
                                 <div class="col-md-6 mb-3">
 
                                     <label for="cvv"
@@ -286,11 +357,21 @@
                                         id="cvv"
                                         name="cvv"
                                         class="form-control"
-                                        maxlength="4"
+                                        ng-model="billing.cvv"
                                         inputmode="numeric"
+                                        maxlength="4"
                                         autocomplete="off"
                                         placeholder="123"
                                         required>
+
+                                    <small
+                                        class="text-danger"
+                                        ng-show="billingForm.cvv.$touched &&
+                                                 billingForm.cvv.$invalid">
+
+                                        Security code is required.
+
+                                    </small>
 
                                 </div>
 
@@ -302,9 +383,10 @@
 
                                 <button
                                     type="submit"
-                                    class="btn btn-checkout btn-lg">
+                                    class="btn btn-checkout btn-lg"
+                                    ng-disabled="submitting || cart.length === 0">
 
-                                    Submit Demo Billing Details
+                                    {{submitting ? 'Submitting...' : 'Submit Demo Billing Details'}}
 
                                 </button>
 
@@ -325,59 +407,97 @@
                 <div class="card billing-card">
 
                     <div class="card-header">
-
                         <h3>Order Summary</h3>
-
                     </div>
 
                     <div class="card-body">
 
-                        <!--
-                            billing.js dynamically adds the
-                            shopping cart products before the
-                            shipping-info element below.
-                        -->
+                        <!-- Dynamically Loaded Cart Products -->
+                        <div
+                            class="order-item"
+                            ng-repeat="item in cart track by item.id">
 
-                        <div class="shipping-info">
+                            <span>
+                                {{item.name}} x {{item.quantity}}
+                            </span>
 
-                            <hr>
+                            <span>
+                                {{item.price * item.quantity | currency}}
+                            </span>
 
-                            <!-- Shipping Cost -->
-                            <div class="order-item">
-
-                                <span>Shipping</span>
-
-                                <span>$2.00</span>
-
-                            </div>
-
-                            <hr>
+                        </div>
 
 
-                            <!-- Order Total -->
-                            <div class="order-total">
+                        <!-- Empty Cart Message -->
+                        <p
+                            class="text-muted"
+                            ng-if="cart.length === 0">
 
-                                <strong>Total</strong>
+                            Your shopping cart is empty.
 
-                                <strong>$0.00</strong>
-
-                            </div>
+                        </p>
 
 
-                            <!-- Shipping Information -->
-                            <div class="mt-4">
+                        <hr>
 
-                                <h5>Delivery Details</h5>
 
-                                <p class="text-muted">
+                        <!-- Total Items -->
+                        <div class="order-item">
 
-                                    Prepared within 15–20 minutes
-                                    and delivered locally within
-                                    approximately one hour.
+                            <span>Total Items</span>
 
-                                </p>
+                            <span>{{totalItems()}}</span>
 
-                            </div>
+                        </div>
+
+
+                        <!-- Subtotal -->
+                        <div class="order-item">
+
+                            <span>Subtotal</span>
+
+                            <span>{{subtotal() | currency}}</span>
+
+                        </div>
+
+
+                        <!-- Shipping -->
+                        <div class="order-item">
+
+                            <span>Shipping</span>
+
+                            <span>{{shipping | currency}}</span>
+
+                        </div>
+
+
+                        <hr>
+
+
+                        <!-- Grand Total -->
+                        <div class="order-total">
+
+                            <strong>Total</strong>
+
+                            <strong>
+                                {{total() | currency}}
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Delivery Details -->
+                        <div class="shipping-info mt-4">
+
+                            <h5>Delivery Details</h5>
+
+                            <p class="text-muted">
+
+                                Prepared within 15–20 minutes
+                                and delivered locally within
+                                approximately one hour.
+
+                            </p>
 
                         </div>
 
@@ -398,16 +518,12 @@
         <div class="container">
 
             <p class="mb-1">
-
                 ☕ Cozy Corner Cafe
-
             </p>
 
             <p class="mb-0">
-
                 &copy; 2026 Cozy Corner Cafe.
                 All Rights Reserved.
-
             </p>
 
         </div>
@@ -415,18 +531,16 @@
     </footer>
 
 
-    <!-- jQuery Library -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- AngularJS Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
 
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
-    <!-- Billing JavaScript -->
-    <!-- Handles validation, cart totals, JSON and AJAX -->
+    <!-- Billing AngularJS Controller -->
     <script src="billing.js"></script>
 
 </body>
-
 </html>
