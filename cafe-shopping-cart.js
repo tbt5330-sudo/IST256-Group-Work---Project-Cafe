@@ -1,257 +1,215 @@
+
+'use strict';
+
 let products = [];
 let shoppingCart = [];
 
 $(document).ready(function () {
-    loadCartProducts();
-    loadCart();
+  loadCartProducts();
+  loadCart();
 
-    // Search products
-    $("#searchBox").on("keyup", function () {
-        const searchTerm = $(this).val().toLowerCase();
-        showAvailableProducts(searchTerm);
-    });
+  $('#searchBox').on('input', function () {
+    showAvailableProducts($(this).val());
+  });
 
-    // Add product to cart
-    $("#productList").on("click", ".addToCartBtn", function () {
-        const productID = $(this).data("id");
-        addToCart(productID);
-    });
+  $('#productList').on('click', '.addToCartBtn', function () {
+    addToCart($(this).attr('data-id'));
+  });
 
-    // Remove product from cart
-    $("#cartTableBody").on("click", ".removeBtn", function () {
-        const productID = $(this).data("id");
-        removeFromCart(productID);
-    });
+  $('#cartTableBody').on('click', '.removeBtn', function () {
+    removeFromCart($(this).attr('data-id'));
+  });
 
-    // Checkout
-    $(".btn-checkout").on("click", function () {
-        if (shoppingCart.length === 0) {
-            alert("Your shopping cart is empty.");
-            return;
-        }
+  $('.btn-checkout').on('click', function () {
+    if (!shoppingCart.length) {
+      alert('Your shopping cart is empty.');
+      return;
+    }
 
-        sendCartToAPI();
-    });
+    window.location.href = 'cafe-billing.html';
+  });
 });
 
+function safeCart(items) {
+  return Array.isArray(items)
+    ? items.filter(item =>
+        item &&
+        typeof item.id === 'string' &&
+        Number.isInteger(Number(item.quantity)) &&
+        Number(item.quantity) > 0
+      )
+    : [];
+}
 
-// Load products from Product Management/localStorage or products.json
 function loadCartProducts() {
-    const savedProducts = localStorage.getItem("cafeProducts");
+  try {
+    const saved = localStorage.getItem('cafeProducts');
 
-    if (savedProducts) {
-        products = JSON.parse(savedProducts);
-        showAvailableProducts("");
-    } else {
-        $.getJSON("products.json", function (data) {
-            products = data;
-            showAvailableProducts("");
-        }).fail(function () {
-            $("#productList").html(`
-                <tr>
-                    <td colspan="4" class="text-center">
-                        Could not load products.
-                    </td>
-                </tr>
-            `);
-        });
-    }
-}
+    if (saved) {
+      const parsed = JSON.parse(saved);
 
-
-// Load the saved shopping cart
-function loadCart() {
-    const savedCart = localStorage.getItem("cafeShoppingCart");
-
-    if (savedCart) {
-        shoppingCart = JSON.parse(savedCart);
-    } else {
-        shoppingCart = [];
-    }
-
-    showCart();
-}
-
-
-// Save shopping cart as JSON in localStorage
-function saveCart() {
-    localStorage.setItem(
-        "cafeShoppingCart",
-        JSON.stringify(shoppingCart)
-    );
-}
-
-
-// Display and search available products
-function showAvailableProducts(searchTerm) {
-    searchTerm = searchTerm || "";
-
-    let rows = "";
-
-    $.each(products, function (index, product) {
-        const productText = (
-            product.id + " " +
-            product.name + " " +
-            product.category
-        ).toLowerCase();
-
-        if (productText.includes(searchTerm.toLowerCase())) {
-            rows += `
-                <tr>
-                    <td>${escapeHtml(product.name)}</td>
-                    <td>${escapeHtml(product.category)}</td>
-                    <td>$${Number(product.price).toFixed(2)}</td>
-                    <td>
-                        <button
-                            class="btn btn-add addToCartBtn"
-                            data-id="${escapeHtml(product.id)}">
-                            Add to Cart
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }
-    });
-
-    if (rows === "") {
-        rows = `
-            <tr>
-                <td colspan="4" class="text-center">
-                    No products found.
-                </td>
-            </tr>
-        `;
-    }
-
-    $("#productList").html(rows);
-}
-
-
-// Add a product to the shopping cart
-function addToCart(productID) {
-    const product = products.find(function (item) {
-        return item.id === productID;
-    });
-
-    if (!product) {
+      if (Array.isArray(parsed)) {
+        products = parsed;
+        showAvailableProducts('');
         return;
+      }
     }
+  } catch (error) {
+    console.warn(
+      'Saved products unavailable; loading catalog.',
+      error
+    );
+  }
 
-    const existingItem = shoppingCart.find(function (item) {
-        return item.id === productID;
+  $.getJSON('products.json')
+    .done(function (data) {
+      products = Array.isArray(data) ? data : [];
+      showAvailableProducts('');
+    })
+    .fail(function () {
+      $('#productList').html(
+        '<tr><td colspan="4">Unable to load cafe products.</td></tr>'
+      );
     });
-
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        shoppingCart.push({
-            id: product.id,
-            name: product.name,
-            category: product.category,
-            unit: product.unit,
-            price: Number(product.price),
-            quantity: 1
-        });
-    }
-
-    saveCart();
-    showCart();
 }
 
+function loadCart() {
+  try {
+    shoppingCart = safeCart(
+      JSON.parse(
+        localStorage.getItem('cafeShoppingCart') || '[]'
+      )
+    );
+  } catch (_) {
+    shoppingCart = [];
+  }
 
-// Remove a product from the shopping cart
-function removeFromCart(productID) {
-    shoppingCart = shoppingCart.filter(function (item) {
-        return item.id !== productID;
-    });
-
-    saveCart();
-    showCart();
+  showCart();
 }
 
+function saveCart() {
+  localStorage.setItem(
+    'cafeShoppingCart',
+    JSON.stringify(shoppingCart)
+  );
+}
 
-// Display the shopping cart
+function escapeHtml(value) {
+  return $('<div>')
+    .text(String(value == null ? '' : value))
+    .html();
+}
+
+function showAvailableProducts(term) {
+  const search = String(term || '').toLowerCase();
+  let rows = '';
+
+  products.forEach(function (product) {
+    const words = (
+      product.id + ' ' +
+      product.name + ' ' +
+      product.category
+    ).toLowerCase();
+
+    if (!words.includes(search)) return;
+
+    rows += `
+      <tr>
+        <td>${escapeHtml(product.name)}</td>
+        <td>${escapeHtml(product.category)}</td>
+        <td>$${Number(product.price).toFixed(2)}</td>
+        <td>
+          <button type="button"
+                  class="btn btn-add addToCartBtn"
+                  data-id="${escapeHtml(product.id)}">
+            Add to Cart
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  $('#productList').html(
+    rows ||
+    '<tr><td colspan="4" class="text-center">No products found.</td></tr>'
+  );
+}
+
+function addToCart(id) {
+  const product = products.find(
+    p => p.id === id
+  );
+
+  if (!product) return;
+
+  const existing = shoppingCart.find(
+    p => p.id === id
+  );
+
+  if (existing) {
+    existing.quantity = Math.min(
+      99,
+      Number(existing.quantity) + 1
+    );
+  } else {
+    shoppingCart.push({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      unit: product.unit,
+      price: Number(product.price),
+      quantity: 1
+    });
+  }
+
+  saveCart();
+  showCart();
+}
+
+function removeFromCart(id) {
+  shoppingCart = shoppingCart.filter(
+    p => p.id !== id
+  );
+
+  saveCart();
+  showCart();
+}
+
 function showCart() {
-    let rows = "";
-    let totalItems = 0;
-    let grandTotal = 0;
+  let rows = '';
+  let items = 0;
+  let total = 0;
 
-    $.each(shoppingCart, function (index, item) {
-        const itemTotal = Number(item.price) * item.quantity;
+  shoppingCart.forEach(function (item) {
+    const quantity = Number(item.quantity);
+    const price = Number(item.price);
+    const line = price * quantity;
 
-        totalItems += item.quantity;
-        grandTotal += itemTotal;
+    items += quantity;
+    total += line;
 
-        rows += `
-            <tr>
-                <td>${escapeHtml(item.name)}</td>
-                <td>${item.quantity}</td>
-                <td>$${Number(item.price).toFixed(2)}</td>
-                <td>$${itemTotal.toFixed(2)}</td>
-                <td>
-                    <button
-                        class="btn btn-remove removeBtn"
-                        data-id="${escapeHtml(item.id)}">
-                        Remove
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
+    rows += `
+      <tr>
+        <td>${escapeHtml(item.name)}</td>
+        <td>${quantity}</td>
+        <td>$${price.toFixed(2)}</td>
+        <td>$${line.toFixed(2)}</td>
+        <td>
+          <button type="button"
+                  class="btn btn-remove removeBtn"
+                  data-id="${escapeHtml(item.id)}">
+            Remove
+          </button>
+        </td>
+      </tr>
+    `;
+  });
 
-    if (rows === "") {
-        rows = `
-            <tr>
-                <td colspan="5" class="text-center">
-                    Your cart is empty.
-                </td>
-            </tr>
-        `;
-    }
+  $('#cartTableBody').html(
+    rows ||
+    '<tr><td colspan="5" class="text-center">Your cart is empty.</td></tr>'
+  );
 
-    $("#cartTableBody").html(rows);
-    $("#itemCount").text(totalItems);
-    $("#grandTotal").text("$" + grandTotal.toFixed(2));
-}
-
-
-// Prepare cart JSON and send it to the future REST API
-function sendCartToAPI() {
-    const cartData = {
-        items: shoppingCart,
-        totalItems: shoppingCart.reduce(function (total, item) {
-            return total + item.quantity;
-        }, 0),
-        grandTotal: shoppingCart.reduce(function (total, item) {
-            return total + (Number(item.price) * item.quantity);
-        }, 0)
-    };
-
-    $.ajax({
-        // Replace with your real API URL when the REST API is created
-        url: "https://example.com/api/cart",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(cartData),
-
-        success: function () {
-            alert("Your order was successfully sent!");
-        },
-
-        error: function () {
-            // Expected until the REST API is created
-            console.log("Cart JSON ready for the future REST API:");
-            console.log(JSON.stringify(cartData, null, 2));
-
-            alert(
-                "Your cart data has been prepared as JSON for the future REST API."
-            );
-        }
-    });
-}
-
-
-// Prevent text from being interpreted as HTML
-function escapeHtml(text) {
-    return $("<div>").text(text).html();
+  $('#itemCount').text(items);
+  $('#grandTotal').text('$' + total.toFixed(2));
 }
