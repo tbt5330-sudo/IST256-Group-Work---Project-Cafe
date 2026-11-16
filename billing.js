@@ -1,236 +1,353 @@
 
 // billing.js
-// Billing validation, JSON creation, and AJAX submission
+// Cozy Corner Cafe Billing Details
+// AngularJS, JavaScript validation, JSON, and AJAX
 
-$(document).ready(function () {
+"use strict";
 
-    const SHIPPING_COST = 2.00;
-    const API_URL = "/api/billing";
+angular.module("billingApp", [])
 
-    // Retrieve existing shopping cart
-    function getCart() {
-        return JSON.parse(
-            localStorage.getItem("cafeShoppingCart") || "[]"
-        );
-    }
+.controller("BillingController", [
+    "$scope",
+    "$http",
+    function ($scope, $http) {
 
-    // Calculate order totals
-    function calculateOrder() {
-
-        const cart = getCart();
-
-        let subtotal = 0;
-        let totalItems = 0;
-
-        cart.forEach(function (item) {
-            subtotal += Number(item.price) * Number(item.quantity);
-            totalItems += Number(item.quantity);
-        });
-
-        return {
-            items: cart,
-            totalItems: totalItems,
-            subtotal: subtotal,
-            shipping: SHIPPING_COST,
-            total: subtotal + SHIPPING_COST
+        // Billing form information
+        $scope.billing = {
+            fullName: "",
+            address: "",
+            cardNumber: "",
+            expiration: null,
+            cvv: ""
         };
-    }
 
-    // Display order summary
-    function displayOrder() {
+        // Validation and submission messages
+        $scope.status = {
+            success: false,
+            message: "",
+            errors: []
+        };
 
-        const order = calculateOrder();
-        const summary = $(".col-lg-4 .billing-card .card-body");
+        $scope.submitting = false;
 
-        summary.find(".dynamic-order-item").remove();
+        // Retrieve cart from existing website storage
+        function loadCart() {
 
-        const shippingInfo = summary.find(".shipping-info");
+            try {
 
-        order.items.forEach(function (item) {
+                const savedCart = JSON.parse(
+                    localStorage.getItem("cafeShoppingCart") || "[]"
+                );
 
-            const row = $("<div>")
-                .addClass("order-item dynamic-order-item");
+                return Array.isArray(savedCart)
+                    ? savedCart
+                    : [];
 
-            row.append(
-                $("<span>").text(
-                    item.name + " x " + item.quantity
-                )
-            );
+            } catch (error) {
 
-            row.append(
-                $("<span>").text(
-                    "$" + (
-                        Number(item.price) * item.quantity
-                    ).toFixed(2)
-                )
-            );
+                return [];
 
-            shippingInfo.before(row);
-
-        });
-
-        summary.find(".order-total strong:last")
-            .text("$" + order.total.toFixed(2));
-
-        summary.find(".order-item:not(.dynamic-order-item)")
-            .last()
-            .find("span:last")
-            .text("$" + SHIPPING_COST.toFixed(2));
-
-    }
-
-    displayOrder();
-
-    // Credit card validation using Luhn algorithm
-    function validateCard(number) {
-
-        if (!/^\d{13,19}$/.test(number)) {
-            return false;
+            }
         }
 
-        let sum = 0;
-        let doubleDigit = false;
+        $scope.cart = loadCart();
 
-        for (let i = number.length - 1; i >= 0; i--) {
+        // Shipping cost
+        $scope.shipping =
+            $scope.cart.length > 0 ? 2.00 : 0;
 
-            let digit = Number(number[i]);
 
-            if (doubleDigit) {
-                digit *= 2;
+        // Calculate total number of items
+        $scope.totalItems = function () {
 
-                if (digit > 9) {
-                    digit -= 9;
-                }
+            return $scope.cart.reduce(
+                function (total, item) {
+
+                    return total + Number(item.quantity);
+
+                }, 0
+            );
+
+        };
+
+
+        // Calculate order subtotal
+        $scope.subtotal = function () {
+
+            return $scope.cart.reduce(
+                function (total, item) {
+
+                    return total +
+                        Number(item.price) *
+                        Number(item.quantity);
+
+                }, 0
+            );
+
+        };
+
+
+        // Calculate order total
+        $scope.total = function () {
+
+            return $scope.subtotal() + $scope.shipping;
+
+        };
+
+
+        // Validate credit card number with Luhn algorithm
+        function validateCard(number) {
+
+            if (!/^\d{13,19}$/.test(number)) {
+                return false;
             }
 
-            sum += digit;
-            doubleDigit = !doubleDigit;
+            let sum = 0;
+            let doubleDigit = false;
+
+            for (let i = number.length - 1; i >= 0; i--) {
+
+                let digit = Number(number[i]);
+
+                if (doubleDigit) {
+
+                    digit *= 2;
+
+                    if (digit > 9) {
+                        digit -= 9;
+                    }
+                }
+
+                sum += digit;
+                doubleDigit = !doubleDigit;
+            }
+
+            return sum % 10 === 0;
         }
 
-        return sum % 10 === 0;
-    }
 
-    // Billing form submission
-    $("#billingForm").on("submit", function (event) {
+        // Submit billing form
+        $scope.submitBilling = function () {
 
-        event.preventDefault();
+            if ($scope.submitting) {
+                return;
+            }
 
-        const cart = getCart();
+            // Clear previous messages
+            $scope.status = {
+                success: false,
+                message: "",
+                errors: []
+            };
 
-        const fullName = $("#fullName").val().trim();
-        const address = $("#address").val().trim();
+            // Read AngularJS bound fields
+            const fullName =
+                ($scope.billing.fullName || "").trim();
 
-        const cardNumber = $("#cardNumber")
-            .val()
-            .replace(/[\s-]/g, "");
+            const address =
+                ($scope.billing.address || "").trim();
 
-        const expiration = $("#expiration").val();
-        const cvv = $("#cvv").val().trim();
+            const cardNumber =
+                ($scope.billing.cardNumber || "")
+                    .replace(/[\s-]/g, "");
 
-        if (!this.reportValidity()) {
-            return;
-        }
+            const cvv = $scope.billing.cvv || "";
 
-        if (cart.length === 0) {
-            alert("Your shopping cart is empty.");
-            return;
-        }
+            const expiration =
+                $scope.billing.expiration;
 
-        if (!validateCard(cardNumber)) {
-            alert("Please enter a valid credit card number.");
-            return;
-        }
 
-        if (!/^\d{3,4}$/.test(cvv)) {
-            alert("Please enter a valid security code.");
-            return;
-        }
+            // Validate full name
+            if (fullName.length < 2) {
 
-        // Convert HTML month input (YYYY-MM) to MM/YY
-        const parts = expiration.split("-");
-
-        const year = Number(parts[0]);
-        const month = Number(parts[1]);
-
-        if (!year || month < 1 || month > 12) {
-            alert("Please enter a valid expiration date.");
-            return;
-        }
-
-        const today = new Date();
-
-        if (
-            year < today.getFullYear() ||
-            (year === today.getFullYear() &&
-             month < today.getMonth() + 1)
-        ) {
-            alert("Your credit card has expired.");
-            return;
-        }
-
-        const order = calculateOrder();
-
-        // Create billing JSON
-        const billingData = {
-
-            fullName: fullName,
-
-            address: address,
-
-            cardNumber: cardNumber,
-
-            expiry:
-                String(month).padStart(2, "0") +
-                "/" +
-                String(year).slice(-2),
-
-            cvv: cvv,
-
-            orderSummary: order
-
-        };
-
-        // AJAX request to Node.js
-        $.ajax({
-
-            url: API_URL,
-
-            type: "POST",
-
-            contentType: "application/json",
-
-            dataType: "json",
-
-            data: JSON.stringify(billingData),
-
-            success: function (response) {
-
-                alert(response.message);
-
-                localStorage.removeItem("cafeShoppingCart");
-
-                $("#billingForm")[0].reset();
-
-                displayOrder();
-
-            },
-
-            error: function (xhr) {
-
-                const errors =
-                    xhr.responseJSON &&
-                    xhr.responseJSON.errors;
-
-                alert(
-                    errors
-                        ? errors.join("\n")
-                        : "Unable to submit billing information."
+                $scope.status.errors.push(
+                    "Please enter your full name."
                 );
 
             }
 
-        });
 
-    });
+            // Validate address
+            if (!address) {
 
-});
+                $scope.status.errors.push(
+                    "Billing address is required."
+                );
+
+            }
+
+
+            // Validate card number
+            if (!validateCard(cardNumber)) {
+
+                $scope.status.errors.push(
+                    "Please enter a valid credit card number."
+                );
+
+            }
+
+
+            // Validate CVV
+            if (!/^\d{3,4}$/.test(cvv)) {
+
+                $scope.status.errors.push(
+                    "Security code must be 3 or 4 digits."
+                );
+
+            }
+
+
+            // Validate expiration date
+            let expiry = "";
+
+            if (
+                expiration instanceof Date &&
+                !isNaN(expiration.getTime())
+            ) {
+
+                const month =
+                    expiration.getMonth() + 1;
+
+                const year =
+                    expiration.getFullYear();
+
+                // Format expected by existing Server.js
+                expiry =
+                    String(month).padStart(2, "0") +
+                    "/" +
+                    String(year).slice(-2);
+
+                const today = new Date();
+
+                if (
+                    year < today.getFullYear() ||
+                    (
+                        year === today.getFullYear() &&
+                        month < today.getMonth() + 1
+                    )
+                ) {
+
+                    $scope.status.errors.push(
+                        "The credit card has expired."
+                    );
+
+                }
+
+            } else {
+
+                $scope.status.errors.push(
+                    "Please enter a valid expiration date."
+                );
+
+            }
+
+
+            // Validate shopping cart
+            if ($scope.cart.length === 0) {
+
+                $scope.status.errors.push(
+                    "Your shopping cart is empty."
+                );
+
+            }
+
+
+            // Stop submission if validation fails
+            if ($scope.status.errors.length > 0) {
+                return;
+            }
+
+
+            // Create billing JSON object
+            const billingData = {
+
+                fullName: fullName,
+
+                address: address,
+
+                // Demo-only payment fields expected by Server.js
+                cardNumber: cardNumber,
+
+                expiry: expiry,
+
+                cvv: cvv,
+
+                orderSummary: {
+
+                    items: $scope.cart,
+
+                    totalItems: $scope.totalItems(),
+
+                    subtotal: $scope.subtotal(),
+
+                    shipping: $scope.shipping,
+
+                    total: $scope.total()
+
+                }
+
+            };
+
+
+            // Prevent multiple submissions
+            $scope.submitting = true;
+
+
+            // AJAX: Send billing JSON to Node.js REST service
+            $http.post("/api/billing", billingData)
+
+                .then(function (response) {
+
+                    // Display server confirmation
+                    $scope.status.success = true;
+
+                    $scope.status.message =
+                        response.data.message ||
+                        "Billing details submitted successfully.";
+
+                    // Clear shopping cart after success
+                    localStorage.removeItem(
+                        "cafeShoppingCart"
+                    );
+
+                    $scope.cart = [];
+
+                    $scope.shipping = 0;
+
+
+                    // Reset billing form
+                    $scope.billing = {
+                        fullName: "",
+                        address: "",
+                        cardNumber: "",
+                        expiration: null,
+                        cvv: ""
+                    };
+
+                })
+
+                .catch(function (error) {
+
+                    // Display server errors
+                    $scope.status.errors =
+                        error.data &&
+                        Array.isArray(error.data.errors)
+
+                            ? error.data.errors
+
+                            : [
+                                "Unable to submit billing details."
+                            ];
+
+                })
+
+                .finally(function () {
+
+                    $scope.submitting = false;
+
+                });
+
+        };
+
+    }
+]);
