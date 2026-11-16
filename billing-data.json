@@ -1,0 +1,26 @@
+
+[
+  {
+    "id": 1731628800000,
+    "name": "Jane Smith",
+    "address": "123 Main Street, Harrisburg, PA",
+    "paymentMethod": "Card ending in 1234",
+    "orderSummary": {
+      "items": [
+        {
+          "id": "LAT001",
+          "name": "Classic Latte",
+          "category": "Coffee",
+          "unit": "Cup",
+          "price": 4.5,
+          "quantity": 1
+        }
+      ],
+      "totalItems": 1,
+      "subtotal": 4.5,
+      "shipping": 2,
+      "total": 6.5
+    },
+    "receivedAt": "2026-11-15T20:00:00.000Z"
+  }
+]
