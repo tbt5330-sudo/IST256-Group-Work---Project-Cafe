@@ -1,73 +1,47 @@
-// returns-search.js - jQuery search for the Returns page
-// Load jQuery and AngularJS first, then this file at the end of the Returns page:
-//   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-//   <script src="returns-search.js"></script>
-//
-// Expects these elements in the Returns HTML:
-//   <input id="returnSearch" type="text" placeholder="Search products...">
-//   <div id="searchResults"></div>
-//   <div id="returnsApp" ng-app="cafeApp" ng-controller="ReturnsController"> ... </div>
 
-$(function () {
-  var allProducts = [];
+"use strict";
 
-  // Load the products JSON once. Accepts either [ {...}, {...} ] or { "products": [ {...} ] }.
-  $.getJSON('products.json')
-    .done(function (data) {
-      allProducts = Array.isArray(data) ? data : (data.products || []);
-    })
-    .fail(function () {
-      $('#searchResults').html('<p class="text-danger">Could not load products.</p>');
+// jQuery product search for the Returns page
+
+$(document).ready(function () {
+
+    // Find the existing product card
+    const productCard = $(".return-card").first();
+
+    // Create the search input
+    const searchBox = $("<input>", {
+        type: "search",
+        id: "returnSearch",
+        class: "form-control mb-3",
+        placeholder: "Search products by name..."
     });
 
-  function showResults(matches) {
-    var $results = $('#searchResults').empty();
+    // Add search box to the card
+    productCard.find(".card-body").first()
+        .prepend(searchBox);
 
-    if (matches.length === 0) {
-      $results.append('<p class="text-muted">No products found.</p>');
-      return;
-    }
+    // Search the products displayed by AngularJS
+    $("#returnSearch").on("input", function () {
 
-    $.each(matches, function (index, product) {
-      var $row = $('<div class="d-flex align-items-center border rounded p-2 mb-2"></div>');
+        const searchTerm = $(this)
+            .val()
+            .trim()
+            .toLowerCase();
 
-      if (product.image) {
-        $row.append($('<img class="me-3" style="width:50px;height:50px;object-fit:cover;">').attr('src', product.image));
-      }
+        $(".product-item").each(function () {
 
-      $row.append(
-        $('<div class="flex-grow-1"></div>')
-          .append($('<strong></strong>').text(product.name))
-          .append($('<div></div>').text('$' + Number(product.price || 0).toFixed(2)))
-      );
+            const productName = $(this)
+                .find("h5")
+                .text()
+                .toLowerCase();
 
-      $('<button type="button" class="btn btn-sm btn-primary">Return this</button>')
-        .on('click', function () {
-          // Hand the chosen product to the AngularJS controller
-          var scope = angular.element(document.getElementById('returnsApp')).scope();
-          scope.$apply(function () {
-            scope.addReturnItem(product);
-          });
-        })
-        .appendTo($row);
+            // Show matching products
+            $(this).toggle(
+                productName.includes(searchTerm)
+            );
 
-      $results.append($row);
-    });
-  }
+        });
 
-  // Filter as the customer types
-  $('#returnSearch').on('input', function () {
-    var term = $.trim($(this).val()).toLowerCase();
-
-    if (term === '') {
-      $('#searchResults').empty();
-      return;
-    }
-
-    var matches = $.grep(allProducts, function (product) {
-      return String(product.name || '').toLowerCase().indexOf(term) !== -1;
     });
 
-    showResults(matches);
-  });
 });
