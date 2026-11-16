@@ -1,57 +1,82 @@
 
-const form = document.querySelector("form");
+'use strict';
 
-form.addEventListener("submit", function (event) {
-    event.preventDefault();
+document.addEventListener('DOMContentLoaded', function () {
 
-    // Get the form values
-    const name = document.getElementById("fullName").value.trim();
-    const age = Number(document.getElementById("age").value);
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const address = document.getElementById("address").value.trim();
-    const phone = document.getElementById("phone").value.trim();
+  document.querySelectorAll('#signupModal form')
+    .forEach(function (form) {
 
-    // Validate the required fields
-    if (!name || !email || !address || !age) {
-        alert("Please fill in all required fields.");
-        return;
-    }
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
 
-    if (age < 1 || age > 120) {
-        alert("Please enter a valid age.");
-        return;
-    }
+        if (!form.reportValidity()) return;
 
-    // Load existing members from browser storage
-    let members = JSON.parse(localStorage.getItem("members")) || [];
+        const field = id =>
+          form.querySelector('#' + id)?.value.trim() || '';
 
-    // Check whether the email is already registered
-    const emailExists = members.some(
-        member => member.email.toLowerCase() === email
-    );
+        const member = {
+          name: field('name'),
+          age: Number(field('age')),
+          email: field('email').toLowerCase(),
+          address: field('address'),
+          phone: field('phone')
+        };
 
-    if (emailExists) {
-        alert("This email is already registered.");
-        return;
-    }
+        if (
+          !member.name ||
+          !member.email ||
+          !member.address ||
+          member.age < 1 ||
+          member.age > 120
+        ) {
+          alert(
+            'Please complete all required fields with a valid age.'
+          );
+          return;
+        }
 
-    // Create the new member
-    const newMember = {
-        id: members.length > 0
-            ? Math.max(...members.map(member => Number(member.id) || 0)) + 1
-            : 1,
-        name: name,
-        age: age,
-        email: email,
-        address: address,
-        phone: phone
-    };
+        let members = [];
 
-    // Save the member
-    members.push(newMember);
-    localStorage.setItem("members", JSON.stringify(members));
+        try {
+          members = JSON.parse(
+            localStorage.getItem('members') || '[]'
+          );
+        } catch (_) {
+          alert('Saved member data is invalid.');
+          return;
+        }
 
-    alert("Welcome to our cafe! Your registration was successful.");
+        if (!Array.isArray(members)) {
+          alert('Saved member data is invalid.');
+          return;
+        }
 
-    form.reset();
+        if (
+          members.some(
+            m => m.email === member.email
+          )
+        ) {
+          alert('This email has already signed up.');
+          return;
+        }
+
+        members.push({
+          ...member,
+          joinedAt: new Date().toISOString()
+        });
+
+        localStorage.setItem(
+          'members',
+          JSON.stringify(members)
+        );
+
+        form.reset();
+
+        alert(
+          'Signup saved in this browser for the class demonstration!'
+        );
+      });
+
+    });
+
 });
