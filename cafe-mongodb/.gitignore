@@ -1,0 +1,24 @@
+# Node.js dependencies
+node_modules/
+
+# Private environment variables
+.env
+.env.*
+!.env.example
+
+# Runtime and log files
+*.log
+npm-debug.log*
+.cafe-private/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor and temporary files
+.vscode/
+.idea/
+*.tmp
+
+# Generated coverage
+coverage/
