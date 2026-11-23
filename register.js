@@ -1,82 +1,76 @@
-
 'use strict';
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll(
+        '#signupModal form, #signup-form'
+    ).forEach(form => {
+        let submitting = false;
 
-  document.querySelectorAll('#signupModal form')
-    .forEach(function (form) {
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
 
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
+            if (
+                submitting ||
+                !form.reportValidity()
+            ) {
+                return;
+            }
 
-        if (!form.reportValidity()) return;
+            const field = name =>
+                form.querySelector(
+                    `#${name}, [name="${name}"]`
+                );
 
-        const field = id =>
-          form.querySelector('#' + id)?.value.trim() || '';
+            const value = name =>
+                field(name)?.value.trim() || '';
 
-        const member = {
-          name: field('name'),
-          age: Number(field('age')),
-          email: field('email').toLowerCase(),
-          address: field('address'),
-          phone: field('phone')
-        };
+            const member = {
+                name: value('name'),
+                email: value('email').toLowerCase(),
+                phone: value('phone')
+            };
 
-        if (
-          !member.name ||
-          !member.email ||
-          !member.address ||
-          member.age < 1 ||
-          member.age > 120
-        ) {
-          alert(
-            'Please complete all required fields with a valid age.'
-          );
-          return;
-        }
+            if (field('age')) {
+                member.age = Number(value('age'));
+            }
 
-        let members = [];
+            if (field('address')) {
+                member.address = value('address');
+            }
 
-        try {
-          members = JSON.parse(
-            localStorage.getItem('members') || '[]'
-          );
-        } catch (_) {
-          alert('Saved member data is invalid.');
-          return;
-        }
+            submitting = true;
 
-        if (!Array.isArray(members)) {
-          alert('Saved member data is invalid.');
-          return;
-        }
+            try {
+                const response = await fetch(
+                    '/api/members',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(member)
+                    }
+                );
 
-        if (
-          members.some(
-            m => m.email === member.email
-          )
-        ) {
-          alert('This email has already signed up.');
-          return;
-        }
+                const data = await response.json();
 
-        members.push({
-          ...member,
-          joinedAt: new Date().toISOString()
+                if (!response.ok) {
+                    throw Error(
+                        data.errors?.join(' ') ||
+                        'Registration failed.'
+                    );
+                }
+
+                form.reset();
+
+                alert(
+                    'Registration saved to MongoDB successfully!'
+                );
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                submitting = false;
+            }
         });
-
-        localStorage.setItem(
-          'members',
-          JSON.stringify(members)
-        );
-
-        form.reset();
-
-        alert(
-          'Signup saved in this browser for the class demonstration!'
-        );
-      });
-
     });
-
 });
