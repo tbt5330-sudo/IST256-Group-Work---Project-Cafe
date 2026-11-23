@@ -1,187 +1,354 @@
-var products = [];
+'use strict';
 
-$(document).ready(function () {
-  loadProducts();
+let products = [];
+let adminAuthorization = '';
+let busy = false;
 
-  // Add Product (form submit)
-  $("#productForm").on("submit", function (e) {
-    e.preventDefault();
-    var item = getFormData();
-    if (!item) return;
+const get = id => document.getElementById(id);
 
-    var exists = products.some(function (p) { return p.id === item.id; });
-    if (exists) {
-      showMessage("That Product ID already exists. Use Update Product instead.", "danger");
-      return;
-    }
-
-    products.push(item);
-    saveProducts();
-    showProducts($("#searchBox").val());
-    clearForm();
-    showMessage("Product added.", "success");
-  });
-
-  // Update Product button
-  $("#updateBtn").on("click", function () {
-    var item = getFormData();
-    if (!item) return;
-
-    var found = false;
-    $.each(products, function (i, p) {
-      if (p.id === item.id) {
-        products[i] = item;
-        found = true;
-      }
-    });
-
-    if (!found) {
-      showMessage("No product with that ID. Use Add Product to create it.", "danger");
-      return;
-    }
-
-    saveProducts();
-    showProducts($("#searchBox").val());
-    clearForm();
-    showMessage("Product updated.", "success");
-  });
-
-  // Search with jQuery
-  $("#searchBox").on("keyup", function () {
-    showProducts($(this).val());
-  });
-
-  // Edit button: fill the form with the row's data
-  $("#productTableBody").on("click", ".editBtn", function () {
-    var id = $(this).data("id");
-    var p = products.find(function (item) { return item.id === id; });
-    $("#productID").val(p.id);
-    $("#productName").val(p.name);
-    $("#category").val(p.category);
-    $("#unit").val(p.unit);
-    $("#price").val(p.price);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-
-  // Delete button
-  $("#productTableBody").on("click", ".deleteBtn", function () {
-    var id = $(this).data("id");
-    if (!confirm("Delete product " + id + "?")) return;
-    products = products.filter(function (item) { return item.id !== id; });
-    saveProducts();
-    showProducts($("#searchBox").val());
-    showMessage("Product deleted.", "success");
-  });
-
-  // Download the current JSON data
-  $("#downloadBtn").on("click", function () {
-    var blob = new Blob([JSON.stringify(products, null, 2)], { type: "application/json" });
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "products.json";
-    link.click();
-  });
-});
-
-// Retrieve data: saved JSON first, otherwise products.json
-function loadProducts() {
-  var saved = localStorage.getItem("cafeProducts");
-  if (saved) {
-    products = JSON.parse(saved);
-    showProducts("");
-  } else {
-    $.getJSON("products.json", function (data) {
-      products = data;
-      saveProducts();
-      showProducts("");
-    }).fail(function () {
-      showMessage("Could not load products.json. Run the page with a local server.", "danger");
-    });
-  }
+function escapeHtml(value) {
+    return String(value ?? '').replace(
+        /[&<>"']/g,
+        character => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[character])
+    );
 }
 
-// Store data as JSON
-function saveProducts() {
-  localStorage.setItem("cafeProducts", JSON.stringify(products));
+function showMessage(message, type = 'success') {
+    get('message').innerHTML = `
+        <div class="alert alert-${type}">
+            ${escapeHtml(message)}
+        </div>
+    `;
 }
 
-// Read and validate the form
+function askAdmin() {
+    if (adminAuthorization) return;
+
+    const username = prompt('Moderator username:');
+
+    if (username === null) {
+        throw Error('Operation cancelled.');
+    }
+
+    const password = prompt('Moderator password:');
+
+    if (password === null) {
+        throw Error('Operation cancelled.');
+    }
+
+    const credentials = new TextEncoder().encode(
+        `${username}:${password}`
+    );
+
+    adminAuthorization = 'Basic ' +
+        btoa(String.fromCharCode(...credentials));
+}
+
+async function api(
+    url,
+    method = 'GET',
+    body,
+    administrator = false
+) {
+    const headers = {};
+
+    if (administrator) {
+        askAdmin();
+        headers.Authorization = adminAuthorization;
+    }
+
+    if (body !== undefined) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    const response = await fetch(url, {
+        method,
+        headers,
+        ...(body === undefined
+            ? {}
+            : { body: JSON.stringify(body) })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            adminAuthorization = '';
+        }
+
+        throw Error(
+            data.errors?.join(' ') ||
+            'Request failed.'
+        );
+    }
+
+    return data;
+}
+
+async function loadProducts() {
+    products = await api('/api/products');
+
+    showProducts(
+        get('searchBox').value
+    );
+}
+
 function getFormData() {
-  var id = $("#productID").val().trim().toUpperCase();
-  var name = $("#productName").val().trim();
-  var category = $("#category").val();
-  var unit = $("#unit").val();
-  var price = parseFloat($("#price").val());
+    const id = get('productID').value
+        .trim()
+        .toUpperCase();
 
-  if (id === "" || name === "" || category === "" || unit === "") {
-    showMessage("Please fill in all fields.", "danger");
-    return null;
-  }
-  if (isNaN(price) || price < 0) {
-    showMessage("Enter a valid price.", "danger");
-    return null;
-  }
-  return { id: id, name: name, category: category, unit: unit, price: price };
-}
+    const name = get('productName').value.trim();
+    const category = get('category').value;
+    const unit = get('unit').value;
+    const rawPrice = get('price').value;
+    const price = Number(rawPrice);
 
-// Build the table rows (filtered by the search text)
-function showProducts(term) {
-  term = (term || "").toLowerCase();
-  var rows = "";
-
-  $.each(products, function (i, p) {
-    var text = (p.id + " " + p.name + " " + p.category).toLowerCase();
-    if (text.indexOf(term) !== -1) {
-      rows += "<tr>" +
-        "<td>" + escapeHtml(p.id) + "</td>" +
-        "<td>" + escapeHtml(p.name) + "</td>" +
-        "<td>" + escapeHtml(p.category) + "</td>" +
-        "<td>" + escapeHtml(p.unit) + "</td>" +
-        "<td>$" + p.price.toFixed(2) + "</td>" +
-        "<td>" +
-          "<button class='btn btn-sm btn-outline-secondary editBtn' data-id='" + escapeHtml(p.id) + "'>Edit</button> " +
-          "<button class='btn btn-sm btn-outline-danger deleteBtn' data-id='" + escapeHtml(p.id) + "'>Delete</button>" +
-        "</td>" +
-        "</tr>";
+    if (
+        !id ||
+        !name ||
+        !category ||
+        !unit ||
+        rawPrice === '' ||
+        !Number.isFinite(price) ||
+        price < 0
+    ) {
+        throw Error(
+            'Complete all fields with a valid price.'
+        );
     }
-  });
 
-  if (rows === "") {
-    rows = "<tr><td colspan='6' class='text-center'>No products found.</td></tr>";
-  }
-  $("#productTableBody").html(rows);
+    return {
+        id,
+        name,
+        category,
+        unit,
+        price,
+        image: get('productImage')?.value.trim() || ''
+    };
 }
 
-function escapeHtml(text) {
-  return $("<div>").text(text).html();
+function showProducts(term = '') {
+    const search = term.toLowerCase();
+
+    const filtered = products.filter(product =>
+        `${product.id} ${product.name} ${product.category}`
+            .toLowerCase()
+            .includes(search)
+    );
+
+    get('productTableBody').innerHTML = filtered
+        .map(product => `
+            <tr>
+                <td>${escapeHtml(product.id)}</td>
+                <td>${escapeHtml(product.name)}</td>
+                <td>${escapeHtml(product.category)}</td>
+                <td>${escapeHtml(product.unit)}</td>
+                <td>$${Number(product.price).toFixed(2)}</td>
+                <td>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary editBtn"
+                        data-id="${escapeHtml(product.id)}">
+                        Edit
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-danger deleteBtn"
+                        data-id="${escapeHtml(product.id)}">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `)
+        .join('') || `
+            <tr>
+                <td colspan="6" class="text-center">
+                    No products found.
+                </td>
+            </tr>
+        `;
 }
 
-function clearForm() {
-  $("#productForm")[0].reset();
+async function perform(action) {
+    if (busy) return;
+
+    busy = true;
+
+    try {
+        await action();
+    } catch (error) {
+        showMessage(error.message, 'danger');
+    } finally {
+        busy = false;
+    }
 }
 
-function showMessage(text, type) {
-  $("#message").html("<div class='alert alert-" + type + " py-2'>" + escapeHtml(text) + "</div>");
-  setTimeout(function () { $("#message").empty(); }, 3000);
-}
-// AJAX: send product JSON to a RESTful API (API will be built later)
-var API_URL = "https://example.com/api/products"; // placeholder
+document.addEventListener('DOMContentLoaded', () => {
+    // Add an optional image URL field to the existing form.
+    if (!get('productImage')) {
+        const block = document.createElement('div');
 
-function sendToAPI(item, method) {
-  var url = (method === "POST") ? API_URL : API_URL + "/" + encodeURIComponent(item.id);
+        block.className = 'mb-3';
 
-  $.ajax({
-    url: url,
-    type: method,
-    contentType: "application/json",
-    data: JSON.stringify(item),
-    dataType: "json",
-    timeout: 5000
-  })
-  .done(function () {
-    showMessage("Product sent to the API.", "success");
-  })
-  .fail(function () {
-    showMessage("Saved locally. API is not available yet.", "warning");
-  });
-}
+        block.innerHTML = `
+            <label for="productImage" class="form-label">
+                Product Image URL (Optional)
+            </label>
+
+            <input
+                type="url"
+                id="productImage"
+                class="form-control"
+                placeholder="https://example.com/image.jpg">
+        `;
+
+        get('price').parentElement.after(block);
+    }
+
+    perform(loadProducts);
+
+    // CREATE PRODUCT
+    get('productForm').addEventListener(
+        'submit',
+        event => {
+            event.preventDefault();
+
+            perform(async () => {
+                const product = getFormData();
+
+                await api(
+                    '/api/products',
+                    'POST',
+                    product,
+                    true
+                );
+
+                await loadProducts();
+                get('productForm').reset();
+
+                showMessage(
+                    'Product added to MongoDB successfully.'
+                );
+            });
+        }
+    );
+
+    // UPDATE PRODUCT
+    get('updateBtn').addEventListener(
+        'click',
+        () => perform(async () => {
+            const product = getFormData();
+
+            await api(
+                '/api/products/' +
+                    encodeURIComponent(product.id),
+                'PUT',
+                product,
+                true
+            );
+
+            await loadProducts();
+            get('productForm').reset();
+
+            showMessage(
+                'Product updated in MongoDB successfully.'
+            );
+        })
+    );
+
+    // SEARCH PRODUCTS
+    get('searchBox').addEventListener(
+        'input',
+        event => {
+            showProducts(event.target.value);
+        }
+    );
+
+    // EDIT / DELETE PRODUCTS
+    get('productTableBody').addEventListener(
+        'click',
+        event => {
+            const button = event.target.closest(
+                'button[data-id]'
+            );
+
+            if (!button) return;
+
+            const id = button.dataset.id;
+
+            if (button.classList.contains('editBtn')) {
+                const product = products.find(
+                    item => item.id === id
+                );
+
+                if (!product) return;
+
+                get('productID').value = product.id;
+                get('productName').value = product.name;
+                get('category').value = product.category;
+                get('unit').value = product.unit;
+                get('price').value = product.price;
+                get('productImage').value =
+                    product.image || '';
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+
+                return;
+            }
+
+            if (
+                button.classList.contains('deleteBtn') &&
+                confirm(`Delete product ${id}?`)
+            ) {
+                perform(async () => {
+                    await api(
+                        '/api/products/' +
+                            encodeURIComponent(id),
+                        'DELETE',
+                        undefined,
+                        true
+                    );
+
+                    await loadProducts();
+
+                    showMessage(
+                        'Product deleted from MongoDB.'
+                    );
+                });
+            }
+        }
+    );
+
+    // DOWNLOAD CURRENT PRODUCT DATA
+    get('downloadBtn').addEventListener(
+        'click',
+        () => perform(async () => {
+            await loadProducts();
+
+            const blob = new Blob(
+                [JSON.stringify(products, null, 2)],
+                { type: 'application/json' }
+            );
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = 'products.json';
+            link.click();
+
+            URL.revokeObjectURL(url);
+        })
+    );
+});
